@@ -21,6 +21,15 @@ npx vercel --prod
 # WEBHOOK_SECRET is dual-use: Telegram secret_token header + Bearer auth for send-message/backfill endpoints
 ```
 
+### community-admin coupling — three pinned values, all fetched with `urllib`
+
+`CA_CONFIG_URL`, `CA_JWKS_URL` and `CA_ISSUER` point at community-admin. Two hard-won constraints (#16):
+
+- **`CA_ISSUER` must equal community-admin's `API_URL`**, because that is what it stamps as `iss` (`jwt.js:28`). It is a literal string compare, so when CA moved host on 2026-08-02 and this did not follow, every valid token was rejected — and `member_ids_from_request` returns an empty set on any failure, so verified members were served **public-only** content for a day with no error, no 401, and (then) no log line. It logs now. `/api/groups`, `/api/links` and `/api/events` all widen visibility from that set; the outage cost Sensemaking Scenius members 73 of 102 links.
+- **`CA_CONFIG_URL` and `CA_JWKS_URL` must stay on `community-admin-server-production.up.railway.app`, NOT `admin.citizeninfra.org`.** The citizeninfra host is Cloudflare-proxied and **403s Python's default user agent**; `python-requests`, `httpx`, Go and Node all pass, `Python-urllib` does not. `lib/config.py:78`, `api/events.py:130` and `PyJWKClient` all fetch via `urllib` and none sets a `User-Agent`. Moving them breaks verification the same silent way — and moving `CA_CONFIG_URL` is worse: the fallback to `groups.json` marks nothing private, so **`scenius` would be exposed to anonymous callers**. Unpinning these needs a Cloudflare WAF skip for `/.well-known/*` first (cibc-brain#30).
+
+Vercel injects env at **deploy** time, so changing a value in the dashboard does nothing until a redeploy. Rule + episodes: cibc-brain `decisions/2026-08-03-identifiers-accept-a-set-during-migration.md` (D-08).
+
 **Repo moved 2026-04-17** from `sensemaking-scenius/scenius-digest` to `zhiganov/scenius-digest` so the Vercel GitHub App could attach cleanly to the personal team (cross-org GitHub App install kept failing). Vercel project moved from Harmonica → Artem's projects team in the same batch.
 
 ### Webhook Registration
