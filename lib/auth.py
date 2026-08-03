@@ -52,7 +52,20 @@ def member_ids_from_request(headers) -> set[str]:
         if CA_ISSUER:
             decode_kwargs["issuer"] = CA_ISSUER
         claims = jwt.decode(token, signing_key.key, **decode_kwargs)
-    except Exception:
+    except Exception as e:
+        # Log it. Returning an empty set is the right behaviour, but it is
+        # indistinguishable from an anonymous caller, so without this line a
+        # misconfiguration presents as normal operation. That is exactly how #16
+        # ran for a day: a stale CA_ISSUER rejected every valid token and served
+        # verified members public-only content, silently.
+        #
+        # The exception type is the diagnosis. InvalidIssuerError means CA_ISSUER
+        # disagrees with what community-admin stamps; PyJWKClientConnectionError
+        # means CA_JWKS_URL is unreachable (e.g. Cloudflare's bot protection
+        # 403ing urllib on the proxied host). Both look identical from outside.
+        #
+        # Never log the token itself — it is a live credential until it expires.
+        print(f"[auth] token rejected: {type(e).__name__}: {e}")
         return set()
 
     memberships = claims.get("memberships") or []

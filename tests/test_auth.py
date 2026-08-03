@@ -155,6 +155,32 @@ def test_unreachable_jwks_returns_empty(monkeypatch, keypair):
     assert auth.member_ids_from_request({"Authorization": f"Bearer {token}"}) == set()
 
 
+def test_rejection_is_logged_without_leaking_the_token(monkeypatch, keypair, capsys):
+    """A silent close looks like normal operation. It must announce itself.
+
+    Guards two things at once: that something is written, and that the token is
+    not what gets written — it is a live credential until it expires.
+    """
+    priv, _ = keypair
+    monkeypatch.setattr(auth, "CA_ISSUER", "https://wrong.example")
+    token = _make_token(
+        priv, memberships=[{"community_id": "scenius"}], iss="https://admin.citizeninfra.org"
+    )
+    assert auth.member_ids_from_request({"Authorization": f"Bearer {token}"}) == set()
+
+    out = capsys.readouterr().out
+    assert "[auth]" in out
+    assert "InvalidIssuerError" in out, "the exception type is the diagnosis"
+    assert token not in out, "the token must never reach the logs"
+
+
+def test_anonymous_request_logs_nothing(capsys):
+    """No Bearer header returns before the try block, so an anonymous caller
+    must not produce log noise — otherwise the signal is worthless."""
+    assert auth.member_ids_from_request({}) == set()
+    assert capsys.readouterr().out == ""
+
+
 def test_missing_token_returns_empty():
     assert auth.member_ids_from_request({}) == set()
 
