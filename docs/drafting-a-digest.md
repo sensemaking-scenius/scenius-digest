@@ -60,6 +60,21 @@ Parse the full JSON and tally, e.g. `Counter(l['topic'] for l in links)`. A
 partial read of the rows is exactly how "they're all tagged news" gets asserted
 about a set that isn't.
 
+**Resolve metadata-poor candidates before you bucket them.** Some links arrive
+with no `og_title` and no `og_description` at all — papers on SSRN, ResearchGate,
+ACM and publisher sites especially, and bare YouTube links. You cannot sort what
+you cannot see, and the failure runs in both directions: an unreadable item gets
+parked in save-for-later for want of metadata rather than want of merit, and an
+unreadable item gets picked for publish-now on faith. Both happened on the first
+run of this document, in the same triage — a paper titled *A Case Study on
+AI-Assisted Scalable Deliberation* was demoted sight-unseen while a bare SSRN
+link made the strongest-eight.
+
+Scrape those candidates in **summary** format and bucket them on what they turn
+out to be. That is what summary format is for: cheap, a half-read rather than a
+read, and explicitly allowed at this stage. **Nothing enters publish-now without
+a title and a one-line sense of what it is.**
+
 ## 3. Read the sources — full text, not summaries
 
 OG metadata is marketing prose at ~200 characters. It means "I have not read
@@ -71,7 +86,7 @@ undersells scale — a $2.5B partnership becomes "a non-profit". Use
 `formats: ["markdown"]` with `onlyMainContent: true`, and actually read the
 result. Batch in parallel.
 
-- Summary format is fine for **triage only** — deciding whether something is worth publishing — never as the basis for what you write.
+- Summary format is fine for **triage only** — deciding whether something is worth publishing, and resolving the metadata-poor candidates in step 2 — never as the basis for what you write.
 - **Loader stubs:** publisher epub and reader URLs return "loading a 3.6 MB publication" and nothing else. Scrape the article or abstract URL instead, which also carries the full author list in its metadata.
 - **Oversized output** gets saved to a file rather than returned. Grep it for the byline and the key figures. Do not drop the source — long pages are usually the ones worth reading.
 
