@@ -163,6 +163,13 @@ Format:
 - Broken links
 - Transcript links (require login)
 
+### Process guardrails
+
+- **Account for every fetched link.** After fetching the full API response, tally topics programmatically and assign every link ID to exactly one bucket: publish now, skip and mark published, or save for later. Report any unaccounted IDs and stop before reading or posting.
+- **Topic placement is authoritative by default.** Use the bot's `topic` field for section placement. If the maintainer explicitly approves an editorial override, record both the source topic and the override in the handoff report.
+- **CIBC announcements come from the brain.** Read `cibc-brain/updates.md` before drafting. Render entries explicitly marked `digest ✗`, omit private details, and do not mark an entry `digest ✓` until the announcement has actually been posted.
+- **Woven sections need lead-ins.** Each non-empty section gets a short sentence naming the thread that connects its entries before the individual links.
+
 ## Communities
 
 | Community | Key | Link source | Digest output | Events |
