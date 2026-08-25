@@ -116,6 +116,7 @@ CREATE TABLE digest_links (
   message_id BIGINT,
   message_text TEXT,
   published BOOLEAN DEFAULT FALSE,
+  published_at TIMESTAMPTZ,           -- when the digest went out; NULL for rows published before 2026-08-25
   og_title TEXT,
   og_description TEXT,
   og_image TEXT,

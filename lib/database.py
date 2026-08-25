@@ -111,11 +111,19 @@ def get_links_by_group(group_id: str, since_days: int = 7, published: bool = Non
 
 
 def mark_as_published(link_ids: list) -> None:
-    """Mark links as published."""
+    """Mark links as published, stamping when the digest went out.
+
+    `published_at` is the only record of a digest's publish date - the digest
+    command reads it to build the `{previous digest date} - {today}` header.
+    Rows marked before this column existed carry NULL.
+    """
     if not link_ids:
         return
     client = get_client()
-    client.table("digest_links").update({"published": True}).in_("id", link_ids).execute()
+    client.table("digest_links").update({
+        "published": True,
+        "published_at": datetime.now(timezone.utc).isoformat(),
+    }).in_("id", link_ids).execute()
 
 
 def get_stats(group_id: str = None) -> dict:
