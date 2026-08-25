@@ -1,18 +1,4 @@
 {
-  "scenius": {
-    "name": "Sensemaking Scenius",
-    "group_id": "-1002141367711",
-    "output_channel": "-1002708526104",
-    "city": null,
-    "topics": {
-      "links": "230",
-      "memes": "4605",
-      "events": "2156",
-      "ai-tools-library": "6430"
-    },
-    "event_topics": ["events"],
-    "event_apis": []
-  },
   "cibc": {
     "name": "Citizen Infra Builders",
     "group_id": "-1003188266615",
