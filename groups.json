@@ -14,19 +14,5 @@
     "event_apis": [
       { "type": "luma", "url": "https://luma.com/cibc", "api_id": "cal-8H09wJN7syCCaRR" }
     ]
-  },
-  "nsrt": {
-    "name": "Novi Sad Relational Tech",
-    "group_id": "-1003669626939",
-    "output_channel": "-1003857482838",
-    "city": "novi-sad",
-    "topics": {
-      "links": "16",
-      "events": "8"
-    },
-    "event_topics": ["events"],
-    "event_apis": [
-      { "type": "luma", "url": "https://luma.com/nsrt", "api_id": "cal-4EPHpP6dDHPKNRb" }
-    ]
   }
 }
